@@ -1,0 +1,446 @@
+#include <iostream>
+#include <vector>
+#include <deque>
+#include <list>
+#include <algorithm>
+#include <set>
+#include <map>
+#include <string>
+#include <iterator>
+#include <functional>
+#include <sstream>
+
+
+// Задача 1
+
+void zadanie1() {
+    std::list<int> L;
+    int num;
+    
+    std::cout << "Введите целые числа (для завершения введите любой нечисловой символ):" << std::endl;
+    std::istream_iterator<int> input_iter(std::cin);
+    std::istream_iterator<int> end;
+    
+    // Заполняем список с помощью итераторов
+    std::copy(input_iter, end, std::back_inserter(L));
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+    
+    std::cout << "Исходный порядок: ";
+    std::ostream_iterator<int> output_iter(std::cout, " ");
+    std::copy(L.begin(), L.end(), output_iter);
+    std::cout << std::endl;
+    
+    std::cout << "Обратный порядок: ";
+    std::copy(L.rbegin(), L.rend(), output_iter);
+    std::cout << std::endl;
+}
+
+
+// Задача 2
+
+void zadanie2() {
+    std::vector<int> V;
+    std::deque<int> D;
+    int num;
+    
+    std::cout << "Введите четное количество целых чисел для вектора V:" << std::endl;
+    std::istream_iterator<int> input_iter(std::cin);
+    std::istream_iterator<int> end;
+    
+    std::copy_n(input_iter, std::distance(input_iter, end), std::back_inserter(V));
+    std::cin.clear();
+    std::cin.ignore(10, '\n');
+    
+    if (V.size() % 2 != 0) {
+        std::cout << "Ошибка: количество элементов вектора должно быть четным!" << std::endl;
+        return;
+    }
+    
+    std::cout << "Введите четное количество целых чисел для дека D:" << std::endl;
+    input_iter = std::istream_iterator<int>(std::cin);
+    
+    std::copy_n(input_iter, std::distance(input_iter, end), std::back_inserter(D));
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+    
+    if (D.size() % 2 != 0) {
+        std::cout << "Ошибка: количество элементов дека должно быть четным!" << std::endl;
+        return;
+    }
+    
+    // Добавляем первую половину дека в конец вектора
+    V.insert(V.end(), D.begin(), D.begin() + D.size()/2);
+    
+    // Добавляем вторую половину вектора в начало дека (в обратном порядке)
+    D.insert(D.begin(), V.rbegin() + V.size()/2, V.rbegin() + V.size());
+    
+    std::cout << "Результат - вектор V: ";
+    std::ostream_iterator<int> output_iter(std::cout, " ");
+    std::copy(V.begin(), V.end(), output_iter);
+    std::cout << std::endl;
+    
+    std::cout << "Результат - дек D: ";
+    std::copy(D.begin(), D.end(), output_iter);
+    std::cout << std::endl;
+}
+
+
+// Задача 3
+
+void zadanie3() {
+    std::vector<int> V;
+    int num;
+    
+    std::cout << "Введите нечетное количество целых чисел N (≥5) для вектора:" << std::endl;
+    std::istream_iterator<int> input_iter(std::cin);
+    std::istream_iterator<int> end;
+    
+    std::copy(input_iter, end, std::back_inserter(V));
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+    
+    if (V.size() < 5 || V.size() % 2 == 0) {
+        std::cout << "Ошибка: N должно быть нечетным числом ≥5!" << std::endl;
+        return;
+    }
+    
+    int middle = V.size() / 2;
+    V.erase(V.begin() + middle - 1, V.begin() + middle + 2);
+    
+    std::cout << "Результат после удаления трех средних элементов: ";
+    std::ostream_iterator<int> output_iter(std::cout, " ");
+    std::copy(V.begin(), V.end(), output_iter);
+    std::cout << std::endl;
+}
+
+
+// Задача 4
+
+void zadanie4() {
+    double A, D;
+    int N;
+    
+    std::cout << "Введите первый элемент прогрессии A: ";
+    std::cin >> A;
+    std::cout << "Введите разность прогрессии D: ";
+    std::cin >> D;
+    std::cout << "Введите количество членов прогрессии N: ";
+    std::cin >> N;
+    
+    if (N <= 0) {
+        std::cout << "Ошибка: N должно быть положительным!" << std::endl;
+        return;
+    }
+    
+    std::vector<double> progression(N);
+    double current = A;
+    
+    std::generate_n(progression.begin(), N, [&current, D]() {
+        double result = current;
+        current += D;
+        return result;
+    });
+    
+    std::cout << "Арифметическая прогрессия: ";
+    std::ostream_iterator<double> output_iter(std::cout, " ");
+    std::copy(progression.begin(), progression.end(), output_iter);
+    std::cout << std::endl;
+}
+
+
+// Задача 5
+
+void zadanie5() {
+    std::vector<int> V;
+    int num;
+    
+    std::cout << "Введите четное количество целых чисел для вектора:" << std::endl;
+    std::istream_iterator<int> input_iter(std::cin);
+    std::istream_iterator<int> end;
+    
+    std::copy(input_iter, end, std::back_inserter(V));
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+    
+    if (V.size() % 2 != 0) {
+        std::cout << "Ошибка: количество элементов должно быть четным!" << std::endl;
+        return;
+    }
+    
+    int half = V.size() / 2;
+    bool found = false;
+    
+    for (int i = 0; i < half && !found; i++) {
+        auto it = std::find(V.begin() + half, V.end(), V[i]);
+        if (it != V.end()) {
+            V.insert(V.begin() + i, 0);
+            found = true;
+        }
+    }
+    
+    std::cout << "Результат: ";
+    std::ostream_iterator<int> output_iter(std::cout, " ");
+    std::copy(V.begin(), V.end(), output_iter);
+    std::cout << std::endl;
+}
+
+
+// Задача 6
+
+void zadanie6() {
+    std::list<int> L;
+    int K, num;
+    
+    std::cout << "Введите K (0 < K < 5): ";
+    std::cin >> K;
+    
+    if (K <= 0 || K >= 5) {
+        std::cout << "Ошибка: K должно быть в диапазоне (0, 5)!" << std::endl;
+        return;
+    }
+    
+    std::cout << "Введите целые числа для списка (≥10 элементов, завершите нечисловым символом):" << std::endl;
+    std::istream_iterator<int> input_iter(std::cin);
+    std::istream_iterator<int> end;
+    
+    std::copy(input_iter, end, std::back_inserter(L));
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+    
+    if (L.size() < 10) {
+        std::cout << "Ошибка: количество элементов должно быть ≥10!" << std::endl;
+        return;
+    }
+    
+    // Копируем первые 5 элементов в конец с циклическим сдвигом вправо на K
+    auto first5_begin = L.begin();
+    auto first5_end = L.begin();
+    std::advance(first5_end, 5);
+    
+    std::vector<int> temp1(5);
+    std::rotate_copy(first5_begin, first5_end, first5_end, temp1.begin());
+    std::rotate(temp1.begin(), temp1.end() - K, temp1.end());
+    L.insert(L.end(), temp1.begin(), temp1.end());
+    
+    // Копируем последние 5 элементов в начало с циклическим сдвигом влево на K
+    auto last5_begin = L.begin();
+    std::advance(last5_begin, L.size() - 10); // позиция перед последними 5 элементами
+    auto last5_end = L.begin();
+    std::advance(last5_end, L.size() - 5);
+    
+    std::vector<int> temp2(5);
+    std::copy(last5_begin, last5_end, temp2.begin());
+    std::rotate(temp2.begin(), temp2.begin() + K, temp2.end());
+    L.insert(L.begin(), temp2.begin(), temp2.end());
+    
+    std::cout << "Результат: ";
+    std::ostream_iterator<int> output_iter(std::cout, " ");
+    std::copy(L.begin(), L.end(), output_iter);
+    std::cout << std::endl;
+}
+
+
+// Задача 7
+
+void zadanie7() {
+    std::vector<int> V;
+    int num;
+    
+    std::cout << "Введите четное количество целых чисел для вектора:" << std::endl;
+    std::istream_iterator<int> input_iter(std::cin);
+    std::istream_iterator<int> end;
+    
+    std::copy(input_iter, end, std::back_inserter(V));
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+    
+    if (V.size() % 2 != 0) {
+        std::cout << "Ошибка: количество элементов должно быть четным!" << std::endl;
+        return;
+    }
+    
+    std::vector<int> sorted_first_half(V.size()/2);
+    std::partial_sort_copy(V.begin(), V.end(), sorted_first_half.begin(), sorted_first_half.end());
+    V.insert(V.end(), sorted_first_half.begin(), sorted_first_half.end());
+    
+    std::cout << "Результат: ";
+    std::ostream_iterator<int> output_iter(std::cout, " ");
+    std::copy(V.begin(), V.end(), output_iter);
+    std::cout << std::endl;
+}
+
+
+// Задача 8
+
+void zadanie8() {
+    std::list<std::string> L;
+    std::deque<std::string> D;
+    std::string word;
+    
+    std::cout << "Введите английские слова (завершите ввод пустой строкой):" << std::endl;
+    
+    while (true) {
+        std::getline(std::cin, word);
+        if (word.empty()) break;
+        L.push_back(word);
+    }
+    
+    if (L.size() < 2) {
+        std::cout << "Ошибка: нужно как минимум 2 слова!" << std::endl;
+        return;
+    }
+    
+    auto it1 = L.begin();
+    auto it2 = std::next(it1);
+    
+    while (it2 != L.end()) {
+        std::string new_word = it1->substr(0, 1) + it2->substr(it2->length() - 1, 1);
+        D.push_back(new_word);
+        ++it1;
+        ++it2;
+    }
+    
+    std::cout << "Результат - дек D: ";
+    std::ostream_iterator<std::string> output_iter(std::cout, " ");
+    std::copy(D.begin(), D.end(), output_iter);
+    std::cout << std::endl;
+}
+
+
+// Задача 9
+
+void zadanie9() {
+    std::vector<int> V0;
+    std::vector<std::vector<int>> vectors;
+    int N, num;
+    
+    std::cout << "Введите элементы вектора V0 (завершите ввод любым нечисловым символом):" << std::endl;
+    std::istream_iterator<int> input_iter(std::cin);
+    std::istream_iterator<int> end;
+    
+    std::copy(input_iter, end, std::back_inserter(V0));
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+    
+    if (V0.empty()) {
+        std::cout << "Ошибка: вектор V0 не может быть пустым!" << std::endl;
+        return;
+    }
+    
+    std::cout << "Введите количество векторов N (> 0): ";
+    std::cin >> N;
+    
+    if (N <= 0) {
+        std::cout << "Ошибка: N должно быть > 0!" << std::endl;
+        return;
+    }
+    
+    for (int i = 0; i < N; i++) {
+        std::vector<int> current;
+        std::cout << "Введите элементы вектора V" << (i + 1) << " (завершите ввод любым нечисловым символом):" << std::endl;
+        
+        std::cin.clear();
+        input_iter = std::istream_iterator<int>(std::cin);
+        std::copy(input_iter, end, std::back_inserter(current));
+        std::cin.clear();
+        std::cin.ignore(10000, '\n');
+        
+        vectors.push_back(current);
+    }
+    
+    std::multiset<int> V0_set(V0.begin(), V0.end());
+    int count = 0;
+    
+    for (int i = 0; i < N; i++) {
+        std::multiset<int> current_set(vectors[i].begin(), vectors[i].end());
+        if (std::includes(current_set.begin(), current_set.end(), V0_set.begin(), V0_set.end())) {
+            count++;
+        }
+    }
+    
+    std::cout << "Количество векторов, содержащих все элементы V0: " << count << std::endl;
+}
+
+
+// Задание 10
+
+void zadanie10() {
+    std::vector<int> V;
+    int num;
+    
+    std::cout << "Введите целые числа для вектора (завершите ввод любым нечисловым символом):" << std::endl;
+    std::istream_iterator<int> input_iter(std::cin);
+    std::istream_iterator<int> end;
+    
+    std::copy(input_iter, end, std::back_inserter(V));
+    std::cin.clear();
+    std::cin.ignore(10000, '\n');
+    
+    std::multimap<int, int> M;
+    
+    for (int num : V) {
+        int last_digit = abs(num) % 10;
+        M.insert(std::make_pair(last_digit, num));
+    }
+    
+    std::cout << "Результат группировки:" << std::endl;
+    for (const auto& pair : M) {
+        std::cout << "Ключ: " << pair.first << ", Элемент: " << pair.second << std::endl;
+    }
+}
+
+
+
+void showFullMenu() {
+    std::cout << "\n=== ПОЛНОЕ МЕНЮ ===" << std::endl;
+    std::cout << "задача 1 (Список в прямом и обратном порядке)" << std::endl;
+    std::cout << "задача 2 (Вектор и дек)" << std::endl;
+    std::cout << "задача 3 (Удаление средних элементов)" << std::endl;
+    std::cout << "задача 4 (Арифметическая прогрессия)" << std::endl;
+    std::cout << "задача 5 (Поиск и вставка нуля)" << std::endl;
+    std::cout << "задача 6 (Циклические сдвиги)" << std::endl;
+    std::cout << "задача 7 (Сортировка и вставка)" << std::endl;
+    std::cout << "задача 8 (Обработка строк)" << std::endl;
+    std::cout << "задача 9 (Поиск включений)" << std::endl;
+    std::cout << "задача 10 (Группировка по последней цифре)" << std::endl;
+    std::cout << "0 - Выход" << std::endl;
+    std::cout << "Выберите задачу: ";
+}
+
+int main() {
+    int choice = 0;
+    
+    do {
+        showFullMenu();
+        std::cin >> choice;
+        
+        switch(choice) {
+            case 1: zadanie1(); break;
+            case 2: zadanie2(); break;
+            case 3: zadanie3(); break;
+            case 4: zadanie4(); break;
+            case 5: zadanie5(); break;
+            case 6: zadanie6(); break;
+            case 7: zadanie7(); break;
+            case 8: zadanie8(); break;
+            case 9: zadanie9(); break;
+            case 10: zadanie10(); break;
+            case 0:
+                std::cout << "Выход из программы..." << std::endl;
+                break;
+            default:
+                std::cout << "Неверный выбор! Попробуйте снова." << std::endl;
+                break;
+        }
+        
+        if (choice != 0) {
+            std::cout << "\nНажмите Enter для продолжения...";
+            std::cin.ignore();
+            std::cin.get();
+        }
+        
+    } while (choice != 0);
+    
+    return 0;
+}
