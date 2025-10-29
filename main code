@@ -276,13 +276,18 @@ void zadanie7() {
 void zadanie8() {
     std::list<std::string> L;
     std::deque<std::string> D;
+    
+    // Полная очистка буфера
+    std::cin.ignore(1000, '\n');
+    
+    std::cout << "Введите английские слова через пробел (минимум 2 слова):" << std::endl;
+    std::string input;
+    std::getline(std::cin, input);
+    
+    // Разбиваем строку на слова
+    std::istringstream iss(input);
     std::string word;
-    
-    std::cout << "Введите английские слова (завершите ввод пустой строкой):" << std::endl;
-    
-    while (true) {
-        std::getline(std::cin, word);
-        if (word.empty()) break;
+    while (iss >> word) {
         L.push_back(word);
     }
     
@@ -291,19 +296,21 @@ void zadanie8() {
         return;
     }
     
-    auto it1 = L.begin();
-    auto it2 = std::next(it1);
+    // Обрабатываем пары слов
+    auto it = L.begin();
+    auto next_it = std::next(it);
     
-    while (it2 != L.end()) {
-        std::string new_word = it1->substr(0, 1) + it2->substr(it2->length() - 1, 1);
+    while (next_it != L.end()) {
+        std::string new_word = std::string(1, (*it)[0]) + std::string(1, (*next_it).back());
         D.push_back(new_word);
-        ++it1;
-        ++it2;
+        ++it;
+        ++next_it;
     }
     
     std::cout << "Результат - дек D: ";
-    std::ostream_iterator<std::string> output_iter(std::cout, " ");
-    std::copy(D.begin(), D.end(), output_iter);
+    for (const auto& w : D) {
+        std::cout << w << " ";
+    }
     std::cout << std::endl;
 }
 
